@@ -1,0 +1,53 @@
+using System;
+using System.IO;
+using System.Text.RegularExpressions;
+
+class Program
+{
+    static void Main()
+    {
+        string sourceDirectory = @"C:\Path\To\Source\Directory"; // Replace this with your actual source directory
+        string destinationDirectory = @"C:\Path\To\Destination\Directory"; // Replace this with your actual destination directory
+
+        string[] fileNames = Directory.GetFiles(sourceDirectory, "*.csv");
+
+        foreach (string filePath in fileNames)
+        {
+            string fileName = Path.GetFileNameWithoutExtension(filePath);
+            string folderName = ExtractSubstringFromFileName(fileName);
+
+            if (!string.IsNullOrEmpty(folderName))
+            {
+                string destinationFolderPath = Path.Combine(destinationDirectory, folderName);
+
+                if (!Directory.Exists(destinationFolderPath))
+                    Directory.CreateDirectory(destinationFolderPath);
+
+                string destinationFilePath = Path.Combine(destinationFolderPath, Path.GetFileName(filePath));
+
+                File.Move(filePath, destinationFilePath);
+            }
+            else
+            {
+                // Handle files with no matching folder name
+            }
+        }
+
+        Console.WriteLine("File sorting completed!");
+    }
+
+    static string ExtractSubstringFromFileName(string fileName)
+    {
+        // Here you can write your regular expression to extract the relevant substring
+        // For example, let's say we want to extract the substring between "file_" and "_data"
+        string pattern = @"file_(.*?)_data";
+        Match match = Regex.Match(fileName, pattern);
+
+        if (match.Success)
+        {
+            return match.Groups[1].Value;
+        }
+
+        return null; // Return null if no match is found
+    }
+}
